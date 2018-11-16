@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     public delegate void PlayerDiedDelegate();
     public PlayerDiedDelegate playerDied;
 
+    public delegate void PlayerWonDelegate();
+    public PlayerWonDelegate playerWon;
+
     private bool dead = false;
     private bool attack = false;
     private bool grounded = false;
@@ -109,5 +112,16 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(0f, 0f);
         anim.SetBool("Dead", true);
         dead = true;
+    }
+
+    public void Win()
+    {
+        if (playerWon != null)
+        {
+            playerWon();
+        }
+        anim.SetTrigger("CelebrateThenStand");
+        isStarted = false;
+        rb.velocity = new Vector2(0f, 0f);
     }
 }
