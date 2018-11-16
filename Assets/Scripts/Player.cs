@@ -8,6 +8,11 @@ public class Player : MonoBehaviour
     public float jumpForce = 300f;
     public Transform groundCheck;
     public LayerMask whatIsGround;
+    public float waitUntilRun;
+    public float gravitationalModifer;
+
+    public delegate void PlayerDiedDelegate();
+    public PlayerDiedDelegate playerDied;
 
     private bool dead = false;
     private bool attack = false;
@@ -22,6 +27,15 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
         anim = GetComponentInChildren<Animator>();
+        Invoke("StartRunning", waitUntilRun);
+    }
+
+    private bool isStarted;
+
+    private void StartRunning()
+    {
+        isStarted = true;
+        anim.SetTrigger("StartRunning");
     }
 
     void Update()
@@ -33,14 +47,19 @@ public class Player : MonoBehaviour
     {
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         anim.SetBool("Ground", grounded);
-        if (!grounded)
+        if (isStarted)
         {
-            anim.SetFloat("vSpeed", rb.velocity.y);
+            if (!grounded)
+            {
+                anim.SetFloat("vSpeed", rb.velocity.y);
+            }
+            if (!dead && !attack)
+            {
+                rb.gravityScale = rb.velocity.y < 0 ? gravitationalModifer : 1;
+                rb.velocity = new Vector2(speed, rb.velocity.y);
+            }
         }
-        if (!dead && !attack)
-        {
-            rb.velocity = new Vector2(speed, rb.velocity.y);
-        }
+
     }
 
     private void HandleInput()
@@ -80,9 +99,6 @@ public class Player : MonoBehaviour
         //    }
         //}
     }
-
-    public delegate void PlayerDiedDelegate();
-    public PlayerDiedDelegate playerDied;
 
     public void Die()
     {
