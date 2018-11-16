@@ -12,12 +12,22 @@ public class GameManager : MonoBehaviour {
     public KeyCode restartButton;
     [Header("Winning")]
     public string winMessage = "Whew! You got away...For now.";
+    [Header("Score")]
+    public Text scoreText;
 
     private void Start()
     {
         messageText.enabled = false;
         player.playerDied += EnableRestartText;
         player.playerWon += EnableWinText;
+    }
+
+    private float score;
+
+    public void IncrementScore(float toIncrement)
+    {
+        score += toIncrement;
+        scoreText.text = "Score: " + score;
     }
 
     private bool isRestartable;
